@@ -39,8 +39,8 @@ class DemoBloc extends BlocBase {
       final startDateTime = DateTime.now();
       final image =
           await boundary.toImage(pixelRatio: DeviceUtilities.pixelRatio);
-      final endDateTime = DateTime.now();
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final endDateTime = DateTime.now();
       showLoadingIndicatorBehaviorSubject.add(LoadingIndicatorModel.hide());
       if (byteData == null) return;
       dartCapturedImageBehaviorSubject.add(
