@@ -1,4 +1,4 @@
-# cuong_demo
+# app
 
 A new Flutter project.
 
