@@ -20,12 +20,14 @@ class DemoBloc extends BlocBase {
   final swiftCapturedImageBehaviorSubject = BehaviorSubject<Image>();
   final showLoadingIndicatorBehaviorSubject =
       BehaviorSubject.seeded(LoadingIndicatorModel.hide());
+  final durationBehaviorSubject = BehaviorSubject<Duration>();
 
   @override
   dispose() {
     showLoadingIndicatorBehaviorSubject.close();
     dartCapturedImageBehaviorSubject.close();
     swiftCapturedImageBehaviorSubject.close();
+    durationBehaviorSubject.close();
     super.dispose();
   }
 
@@ -34,8 +36,10 @@ class DemoBloc extends BlocBase {
       showLoadingIndicatorBehaviorSubject.add(LoadingIndicatorModel.show());
       final boundary =
           globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final startDateTime = DateTime.now();
       final image =
           await boundary.toImage(pixelRatio: DeviceUtilities.pixelRatio);
+      final endDateTime = DateTime.now();
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       showLoadingIndicatorBehaviorSubject.add(LoadingIndicatorModel.hide());
       if (byteData == null) return;
@@ -45,6 +49,8 @@ class DemoBloc extends BlocBase {
           fit: BoxFit.contain,
         ),
       );
+      final differenceDuration = endDateTime.difference(startDateTime);
+      durationBehaviorSubject.add(differenceDuration);
     } catch (e) {
       print(e);
     }
@@ -53,14 +59,18 @@ class DemoBloc extends BlocBase {
   void onTapCaptureScreenWithSwiftButton() async {
     try {
       showLoadingIndicatorBehaviorSubject.add(LoadingIndicatorModel.show());
+      final startDateTime = DateTime.now();
       final result =
           await screenshotChannel.invokeMethod<String?>('captureScreen');
+      final endDateTime = DateTime.now();
       showLoadingIndicatorBehaviorSubject.add(LoadingIndicatorModel.hide());
       if (result == null) return;
       swiftCapturedImageBehaviorSubject.add(Image.memory(
         _decodeBase64Image(result),
         fit: BoxFit.contain,
       ));
+      final differenceDuration = endDateTime.difference(startDateTime);
+      durationBehaviorSubject.add(differenceDuration);
     } on PlatformException catch (exception) {
       print(exception.message);
     }

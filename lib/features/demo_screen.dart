@@ -38,6 +38,12 @@ class _DemoScreenState extends State<DemoScreen> {
                   ),
                   const SizedBox(height: 30),
                   const Text('Results:'),
+                  BlocBuilder(
+                    stream: bloc.durationBehaviorSubject,
+                    builder: (context, duration) {
+                      return Text('Time took: ${duration.toString()}');
+                    },
+                  ),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
